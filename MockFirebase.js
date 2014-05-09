@@ -3,7 +3,22 @@
  * https://github.com/katowulf/mockfirebase
  * @version 0.0.5-pre11
  */
-(function(exports) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['lodash', 'sinon'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('lodash'), require('sinon'));
+    } else {
+        // Browser globals (root is window)
+        root.returnExports = factory(root.lodash, root.sinon);
+    }
+}(this, function (_, sinon) {
+
+  var exports = {};
   var DEBUG = false; // enable lots of console logging (best used while isolating one test case)
 
   /**
@@ -859,8 +874,6 @@
 
   /*** UTIL FUNCTIONS ***/
   var lastChildAutoId = null;
-  var _ = requireLib('lodash', '_');
-  var sinon = requireLib('sinon');
 
   var spyFactory = (function() {
     var fn;
@@ -879,7 +892,6 @@
       }
     }
     else {
-      var sinon = requireLib('sinon');
       fn = sinon.spy.bind(sinon);
     }
     return fn;
@@ -1055,15 +1067,6 @@
     return { code: code||'UNKNOWN_ERROR', message: 'FirebaseSimpleLogin: '+(message||code||'unspecific error') };
   }
 
-  function requireLib(moduleName, variableName) {
-    if( typeof module !== "undefined" && module.exports && typeof(require) === 'function' ) {
-      return require(moduleName);
-    }
-    else {
-      return exports[variableName||moduleName];
-    }
-  }
-
   function hasMeta(data) {
     return _.isObject(data) && (_.has(data, '.priority') || _.has(data, '.value'));
   }
@@ -1133,6 +1136,7 @@
 
   var _Firebase = exports.Firebase;
   var _FirebaseSimpleLogin = exports.FirebaseSimpleLogin;
+
   MockFirebase.noConflict = function() {
     exports.Firebase = _Firebase;
     exports.FirebaseSimpleLogin = _FirebaseSimpleLogin;
@@ -1160,10 +1164,12 @@
   };
 
   // some hoop jumping for node require() vs browser usage
-  exports.MockFirebase = MockFirebase;
-  exports.MockFirebaseSimpleLogin = MockFirebaseSimpleLogin;
-  exports.Firebase = MockFirebase;
-  exports.FirebaseSimpleLogin = MockFirebaseSimpleLogin;
+  exports = {
+    MockFirebase: MockFirebase,
+    MockFirebaseSimpleLogin: MockFirebaseSimpleLogin,
+    Firebase: MockFirebase,
+    FirebaseSimpleLogin: MockFirebaseSimpleLogin
+  };
 
-})(typeof(window) === 'object'? window : module.exports);
-
+  return exports;
+}));
