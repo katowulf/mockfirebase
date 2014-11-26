@@ -2,6 +2,9 @@
 
 var _ = require('lodash');
 
+var SERIAL_VALUE_KEY = '.value';
+var SERIAL_PRIORITY_KEY = '.priority';
+
 exports.makeSnap = function makeSnap (ref, data, pri) {
   data = _.cloneDeep(data);
   if (_.isObject(data) && _.isEmpty(data)) { data = null; }
@@ -15,6 +18,9 @@ exports.makeSnap = function makeSnap (ref, data, pri) {
     key: function () { return ref.key(); },
     getPriority: function () { return pri; },
     forEach: function(cb, scope) {
+      if (!_.isObject(data)) {
+        return;
+      }
       var self = this;
       _.each(data, function (v, k) {
         var res = cb.call(scope, self.child(k));
@@ -22,7 +28,45 @@ exports.makeSnap = function makeSnap (ref, data, pri) {
       });
     },
     child: function (key) {
-      return makeSnap(ref.child(key), _.isObject(data) && _.has(data, key)? data[key] : null, ref.child(key).priority);
+      return makeSnap(ref.child(key), this.hasChild(key)? data[key] : null, ref.child(key).priority);
+    },
+    hasChild: function (key) {
+      return _.isObject(data) && _.has(data, key);
+    },
+    hasChildren: function () {
+      return this.numChildren() > 0;
+    },
+    numChildren: function () {
+      if (_.isObject(data)) {
+        return _.size(data);
+      }
+      return 0;
+    },
+    exportVal: function () {
+      var isPrimitive = !_.isObject(data);
+      var priority = this.getPriority();
+      var hasPriority = _.isNumber(priority) || _.isString(priority);
+      var exportData;
+      if (hasPriority) {
+        exportData = {};
+        exportData[SERIAL_PRIORITY_KEY] = priority;
+      }
+      if (isPrimitive) {
+        if (_.isObject(exportData)) {
+          exportData[SERIAL_VALUE_KEY] = data;
+        } else {
+          exportData = data;
+        }
+      } else {
+        if (!_.isObject(exportData)) {
+          exportData = {};
+        }
+        _.reduce(data, function (memo, v, k) {
+          memo[k] = this.child(k).exportVal();
+          return memo;
+        }, exportData, this);
+      }
+      return exportData;
     }
   };
 };
@@ -38,11 +82,11 @@ exports.mergePaths = function mergePaths (base, add) {
 exports.cleanData = function cleanData(data) {
   var newData = _.clone(data);
   if(_.isObject(newData)) {
-    if(_.has(newData, '.value')) {
-      newData = _.clone(newData['.value']);
+    if(_.has(newData, SERIAL_VALUE_KEY)) {
+      newData = _.clone(newData[SERIAL_VALUE_KEY]);
     }
-    if(_.has(newData, '.priority')) {
-      delete newData['.priority'];
+    if(_.has(newData, SERIAL_PRIORITY_KEY)) {
+      delete newData[SERIAL_PRIORITY_KEY];
     }
 //      _.each(newData, function(v,k) {
 //        newData[k] = cleanData(v);
