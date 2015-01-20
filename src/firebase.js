@@ -333,13 +333,24 @@ MockFirebase.prototype.setTimestampGenerator = function(cb){
 };
 
 MockFirebase.prototype.__generateTimestamp = function(){
-  return Date.now().toString();
+  return Date.now();
 };
 
 MockFirebase.prototype._generateTimestamp = function(){
   var ref = this;
   while(ref.parentRef) ref = ref.parentRef;
-  return ref.__generateTimestamp();
+  var actual, ts = actual = ref.__generateTimestamp();
+  if(_.isNumber(ts)){
+    return ts;
+  }
+  if(_.isDate(ts)){
+    return ts.getTime();
+  }
+  ts = parseInt(ts);
+  if(_.isNaN(ts)){
+    throw new Error('timestamp should be a Date or Number, got: ' + actual);
+  }
+  return ts;
 };
 
 MockFirebase.prototype._dataChanged = function (unparsedData) {

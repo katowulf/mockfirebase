@@ -655,10 +655,10 @@ describe('MockFirebase', function () {
   });
 
   describe('#ServerValue.TIMESTAMP',function(){
-    it('using a custom callback for Timestamp creation',function(){
+    it('using a custom callback that returns a Number',function(){
       var ct = 0;
       var callback = sinon.spy(function(){
-        return new Date(ct++).toString();
+        return ct++;
       });
 
       ref.setTimestampGenerator(callback);
@@ -668,13 +668,48 @@ describe('MockFirebase', function () {
 
       expect(callback).to.have.been.called;
 
-      expect(ref.getData()).to.equal(new Date(0).toString());
+      expect(ref.getData()).to.equal(0);
 
       ref.set(Firebase.ServerValue.TIMESTAMP);
       ref.flush();
-      expect(ref.getData()).to.equal(new Date(1).toString());
+      expect(ref.getData()).to.equal(1);
+    });
+
+    it('using a custom callback that returns a Date',function(){
+      var ct = 0;
+
+      ref.setTimestampGenerator(function(){
+        return new Date(ct++);
+      });
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+
+      expect(ref.getData()).to.equal(0);
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+      expect(ref.getData()).to.equal(1);
     });
   });
 
+  it('defaults to Date.now()',function(){
+    var lowerBound = Date.now();
 
+    ref.set(Firebase.ServerValue.TIMESTAMP);
+    ref.flush();
+
+    expect(ref.getData()).to.be.gte(lowerBound);
+    expect(ref.getData()).to.be.lte(Date.now());
+
+    lowerBound = Date.now();
+    ref.set(Firebase.ServerValue.TIMESTAMP);
+    ref.flush();
+
+    expect(ref.getData()).to.be.gte(lowerBound);
+    expect(ref.getData()).to.be.lte(Date.now());
+
+
+
+  });
 });
