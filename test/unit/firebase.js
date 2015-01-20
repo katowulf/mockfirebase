@@ -709,4 +709,16 @@ describe('MockFirebase', function () {
     expect(ref.getData()).to.be.gte(lowerBound);
     expect(ref.getData()).to.be.lte(Date.now());
   });
+
+  it('will throw an error if custom callback returns unparseable string',function(){
+    ref.setTimestampGenerator(function(){
+      return 'hello';
+    });
+
+    ref.set(Firebase.ServerValue.TIMESTAMP);
+
+    expect(function(){
+      ref.flush();
+    }).to.throw(/hello/);
+  });
 });
