@@ -708,8 +708,5 @@ describe('MockFirebase', function () {
 
     expect(ref.getData()).to.be.gte(lowerBound);
     expect(ref.getData()).to.be.lte(Date.now());
-
-
-
   });
 });
