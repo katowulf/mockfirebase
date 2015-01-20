@@ -339,7 +339,8 @@ MockFirebase.prototype.__generateTimestamp = function(){
 MockFirebase.prototype._generateTimestamp = function(){
   var ref = this;
   while(ref.parentRef) ref = ref.parentRef;
-  var actual, ts = actual = ref.__generateTimestamp();
+  var ts,actual;
+  ts = actual = ref.__generateTimestamp();
   if(_.isNumber(ts)){
     return ts;
   }
