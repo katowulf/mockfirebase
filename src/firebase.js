@@ -32,6 +32,10 @@ function MockFirebase (path, data, parent, name) {
   _.extend(this, Auth.prototype, new Auth());
 }
 
+MockFirebase.ServerValue = {
+  TIMESTAMP:{'.sv':'timestamp'}
+};
+
 MockFirebase.prototype.flush = function (delay) {
   this.queue.flush(delay);
   return this;
@@ -322,6 +326,22 @@ MockFirebase.prototype._childChanged = function (ref) {
   this._triggerAll(events);
 };
 
+MockFirebase.prototype.setTimestampGenerator = function(cb){
+  var ref = this;
+  while(ref.parentRef) ref = ref.parentRef;
+  ref.__generateTimestamp = cb;
+};
+
+MockFirebase.prototype.__generateTimestamp = function(){
+  return Date.now().toString();
+};
+
+MockFirebase.prototype._generateTimestamp = function(){
+  var ref = this;
+  while(ref.parentRef) ref = ref.parentRef;
+  return ref.__generateTimestamp();
+};
+
 MockFirebase.prototype._dataChanged = function (unparsedData) {
   var pri = utils.getMeta(unparsedData, 'priority', this.priority);
   var data = utils.cleanData(unparsedData);
@@ -342,6 +362,10 @@ MockFirebase.prototype._dataChanged = function (unparsedData) {
     if(!_.isObject(data)) {
       events.push(false);
       this.data = data;
+    }
+    else if(utils.isServerTimestamp(data)){
+      events.push(false);
+      this.data = this._generateTimestamp();
     }
     else {
       keysToChange.forEach(function(key) {

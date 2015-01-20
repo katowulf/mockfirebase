@@ -654,5 +654,27 @@ describe('MockFirebase', function () {
     });
   });
 
+  describe('#ServerValue.TIMESTAMP',function(){
+    it('using a custom callback for Timestamp creation',function(){
+      var ct = 0;
+      var callback = sinon.spy(function(){
+        return new Date(ct++).toString();
+      });
+
+      ref.setTimestampGenerator(callback);
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+
+      expect(callback).to.have.been.called;
+
+      expect(ref.getData()).to.equal(new Date(0).toString());
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+      expect(ref.getData()).to.equal(new Date(1).toString());
+    });
+  });
+
 
 });

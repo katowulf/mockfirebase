@@ -69,3 +69,12 @@ exports.priorityComparator = function priorityComparator (a, b) {
   }
   return 0;
 };
+
+exports.isServerTimestamp = function(data){
+  var keys = Object.keys(data);
+  return (
+    keys.length == 1 &&
+    keys[0] == '.sv' &&
+    data['.sv'] == 'timestamp'
+  );
+};
