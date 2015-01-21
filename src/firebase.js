@@ -32,6 +32,10 @@ function MockFirebase (path, data, parent, name) {
   _.extend(this, Auth.prototype, new Auth());
 }
 
+MockFirebase.ServerValue = {
+  TIMESTAMP:{'.sv':'timestamp'}
+};
+
 MockFirebase.prototype.flush = function (delay) {
   this.queue.flush(delay);
   return this;
@@ -322,9 +326,42 @@ MockFirebase.prototype._childChanged = function (ref) {
   this._triggerAll(events);
 };
 
+MockFirebase.setClock = function(fn){
+  MockFirebase._serverClock = fn;
+};
+
+function defaultClock(){
+  return Date.now();
+}
+
+MockFirebase.restoreClock = function(){
+  MockFirebase.setClock(defaultClock);
+};
+
+MockFirebase.restoreClock();
+
+MockFirebase.prototype._generateTimestamp = function(){
+  var ts,actual;
+  ts = actual = MockFirebase._serverClock(this);
+  if(_.isNumber(ts)){
+    return ts;
+  }
+  if(_.isDate(ts)){
+    return ts.getTime();
+  }
+  ts = parseInt(ts);
+  if(_.isNaN(ts)){
+    throw new Error('timestamp should be a Date or Number, got: ' + actual);
+  }
+  return ts;
+};
+
 MockFirebase.prototype._dataChanged = function (unparsedData) {
   var pri = utils.getMeta(unparsedData, 'priority', this.priority);
   var data = utils.cleanData(unparsedData);
+  if(utils.isServerTimestamp(data)){
+    data = this._generateTimestamp();
+  }
   if( pri !== this.priority ) {
     this._priChanged(pri);
   }
@@ -345,7 +382,11 @@ MockFirebase.prototype._dataChanged = function (unparsedData) {
     }
     else {
       keysToChange.forEach(function(key) {
-        this._updateOrAdd(key, unparsedData[key], events);
+        var childData = unparsedData[key];
+        if(utils.isServerTimestamp(childData)){
+          childData = this._generateTimestamp();
+        }
+        this._updateOrAdd(key, childData, events);
       }, this);
     }
 

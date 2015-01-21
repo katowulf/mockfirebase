@@ -9,6 +9,7 @@ describe('MockFirebase', function () {
 
   var ref, spy;
   beforeEach(function () {
+    Firebase.restoreClock();
     ref = new Firebase().child('data');
     ref.set(require('./data.json').data);
     ref.flush();
@@ -654,5 +655,144 @@ describe('MockFirebase', function () {
     });
   });
 
+  describe('#ServerValue.TIMESTAMP',function(){
+    it('using a custom callback that returns a Number',function(){
+      var ct = 0;
+      var callback = sinon.spy(function(){
+        return ct++;
+      });
 
+      Firebase.setClock(callback);
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+
+      expect(callback).to.have.been.called;
+
+      expect(ref.getData()).to.equal(0);
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+      expect(ref.getData()).to.equal(1);
+    });
+
+    it('using a custom callback that returns a Date',function(){
+      var ct = 0;
+
+      Firebase.setClock(function(){
+        return new Date(ct++);
+      });
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+
+      expect(ref.getData()).to.equal(0);
+
+      ref.set(Firebase.ServerValue.TIMESTAMP);
+      ref.flush();
+      expect(ref.getData()).to.equal(1);
+    });
+  });
+
+  it('defaults to Date.now()',function(){
+    var lowerBound = Date.now();
+
+    ref.set(Firebase.ServerValue.TIMESTAMP);
+    ref.flush();
+
+    expect(ref.getData()).to.be.gte(lowerBound);
+    expect(ref.getData()).to.be.lte(Date.now());
+
+    lowerBound = Date.now();
+    ref.set(Firebase.ServerValue.TIMESTAMP);
+    ref.flush();
+
+    expect(ref.getData()).to.be.gte(lowerBound);
+    expect(ref.getData()).to.be.lte(Date.now());
+  });
+
+  it('will throw an error if custom callback returns unparseable string',function(){
+    Firebase.setClock(function(){
+      return 'hello';
+    });
+
+    ref.set(Firebase.ServerValue.TIMESTAMP);
+
+    expect(function(){
+      ref.flush();
+    }).to.throw(/hello/);
+  });
+
+  it('callback gets called with ref',function(){
+    Firebase.setClock(function(ref){
+      if(ref.toString().indexOf('time2') > -1) return 2;
+      if(ref.toString().indexOf('time1') > -1) return 1;
+      return 3;
+    });
+
+    ref.child('time2').set(Firebase.ServerValue.TIMESTAMP);
+    ref.child('time1').set(Firebase.ServerValue.TIMESTAMP);
+    ref.child('time3').set(Firebase.ServerValue.TIMESTAMP);
+    ref.child('time4').set(Firebase.ServerValue.TIMESTAMP);
+
+    ref.flush();
+
+    var data = ref.getData();
+
+    expect(data.time1).to.equal(1);
+    expect(data.time2).to.equal(2);
+    expect(data.time3).to.equal(3);
+    expect(data.time4).to.equal(3);
+  });
+
+  it('multi-value set',function(){
+    Firebase.setClock(function(){return 0;});
+    var timeChild = ref.child('timeMultiValueSet');
+
+    timeChild.on('value',function valueCallback(snap){
+      if(snap.val() === null) return;
+      expect(snap.val()).to.eql({msg:'hello',time:0});
+    });
+
+    ref.flush();
+
+    timeChild.set({
+      time:Firebase.ServerValue.TIMESTAMP,
+      msg:'hello'
+    });
+
+    ref.flush();
+  });
+
+  it('child added',function(){
+    var ct = 0;
+    Firebase.setClock(function(){return ct++;});
+    var timeChild = ref.child('timeChildAdded');
+
+    timeChild.on('child_added',function valueCallback(snap){
+      var val = snap.val();
+      if(val === null) return;
+      if(val.msg == 'hello') {
+        expect(val).to.eql({msg:'hello',time:0});
+      } else {
+        expect(val).to.eql({msg:'goodbye',time:1});
+      }
+    });
+
+    ref.flush();
+
+    timeChild.push({
+      time:Firebase.ServerValue.TIMESTAMP,
+      msg:'hello'
+    });
+
+    ref.flush();
+
+    timeChild.push({
+      time:Firebase.ServerValue.TIMESTAMP,
+      msg:'goodbye'
+    });
+
+    ref.flush();
+  });
 });
