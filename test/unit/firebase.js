@@ -721,4 +721,26 @@ describe('MockFirebase', function () {
       ref.flush();
     }).to.throw(/hello/);
   });
+
+  it('callback gets called with ref',function(){
+    ref.setTimestampGenerator(function(ref){
+      if(ref.toString().indexOf('time2') > -1) return 2;
+      if(ref.toString().indexOf('time1') > -1) return 1;
+      return 3;
+    });
+
+    ref.child('time2').set(Firebase.ServerValue.TIMESTAMP);
+    ref.child('time1').set(Firebase.ServerValue.TIMESTAMP);
+    ref.child('time3').set(Firebase.ServerValue.TIMESTAMP);
+    ref.child('time4').set(Firebase.ServerValue.TIMESTAMP);
+
+    ref.flush();
+
+    var data = ref.getData();
+
+    expect(data.time1).to.equal(1);
+    expect(data.time2).to.equal(2);
+    expect(data.time3).to.equal(3);
+    expect(data.time4).to.equal(3);
+  });
 });
