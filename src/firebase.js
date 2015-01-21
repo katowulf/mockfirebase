@@ -326,21 +326,23 @@ MockFirebase.prototype._childChanged = function (ref) {
   this._triggerAll(events);
 };
 
-MockFirebase.prototype.setTimestampGenerator = function(cb){
-  var ref = this;
-  while(ref.parentRef) ref = ref.parentRef;
-  ref.__generateTimestamp = cb;
+MockFirebase.setClock = function(fn){
+  MockFirebase._serverClock = fn;
 };
 
-MockFirebase.prototype.__generateTimestamp = function(){
+function defaultClock(){
   return Date.now();
+}
+
+MockFirebase.restoreClock = function(){
+  MockFirebase.setClock(defaultClock);
 };
+
+MockFirebase.restoreClock();
 
 MockFirebase.prototype._generateTimestamp = function(){
-  var ref = this;
-  while(ref.parentRef) ref = ref.parentRef;
   var ts,actual;
-  ts = actual = ref.__generateTimestamp(this);
+  ts = actual = MockFirebase._serverClock(this);
   if(_.isNumber(ts)){
     return ts;
   }

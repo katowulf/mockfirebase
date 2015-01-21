@@ -9,6 +9,7 @@ describe('MockFirebase', function () {
 
   var ref, spy;
   beforeEach(function () {
+    Firebase.restoreClock();
     ref = new Firebase().child('data');
     ref.set(require('./data.json').data);
     ref.flush();
@@ -661,7 +662,7 @@ describe('MockFirebase', function () {
         return ct++;
       });
 
-      ref.setTimestampGenerator(callback);
+      Firebase.setClock(callback);
 
       ref.set(Firebase.ServerValue.TIMESTAMP);
       ref.flush();
@@ -678,7 +679,7 @@ describe('MockFirebase', function () {
     it('using a custom callback that returns a Date',function(){
       var ct = 0;
 
-      ref.setTimestampGenerator(function(){
+      Firebase.setClock(function(){
         return new Date(ct++);
       });
 
@@ -711,7 +712,7 @@ describe('MockFirebase', function () {
   });
 
   it('will throw an error if custom callback returns unparseable string',function(){
-    ref.setTimestampGenerator(function(){
+    Firebase.setClock(function(){
       return 'hello';
     });
 
@@ -723,7 +724,7 @@ describe('MockFirebase', function () {
   });
 
   it('callback gets called with ref',function(){
-    ref.setTimestampGenerator(function(ref){
+    Firebase.setClock(function(ref){
       if(ref.toString().indexOf('time2') > -1) return 2;
       if(ref.toString().indexOf('time1') > -1) return 1;
       return 3;
@@ -745,7 +746,7 @@ describe('MockFirebase', function () {
   });
 
   it('multi-value set',function(){
-    ref.setTimestampGenerator(function(){return 0;});
+    Firebase.setClock(function(){return 0;});
     var timeChild = ref.child('timeMultiValueSet');
 
     timeChild.on('value',function valueCallback(snap){
@@ -765,7 +766,7 @@ describe('MockFirebase', function () {
 
   it('child added',function(){
     var ct = 0;
-    ref.setTimestampGenerator(function(){return ct++;});
+    Firebase.setClock(function(){return ct++;});
     var timeChild = ref.child('timeChildAdded');
 
     timeChild.on('child_added',function valueCallback(snap){
