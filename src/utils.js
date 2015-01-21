@@ -71,6 +71,7 @@ exports.priorityComparator = function priorityComparator (a, b) {
 };
 
 exports.isServerTimestamp = function(data){
+  if(!_.isObject(data)) return false;
   var keys = Object.keys(data);
   return (
     keys.length == 1 &&

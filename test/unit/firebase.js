@@ -743,4 +743,55 @@ describe('MockFirebase', function () {
     expect(data.time3).to.equal(3);
     expect(data.time4).to.equal(3);
   });
+
+  it('multi-value set',function(){
+    ref.setTimestampGenerator(function(){return 0;});
+    var timeChild = ref.child('timeMultiValueSet');
+
+    timeChild.on('value',function valueCallback(snap){
+      if(snap.val() === null) return;
+      expect(snap.val()).to.eql({msg:'hello',time:0});
+    });
+
+    ref.flush();
+
+    timeChild.set({
+      time:Firebase.ServerValue.TIMESTAMP,
+      msg:'hello'
+    });
+
+    ref.flush();
+  });
+
+  it('child added',function(){
+    var ct = 0;
+    ref.setTimestampGenerator(function(){return ct++;});
+    var timeChild = ref.child('timeChildAdded');
+
+    timeChild.on('child_added',function valueCallback(snap){
+      var val = snap.val();
+      if(val === null) return;
+      if(val.msg == 'hello') {
+        expect(val).to.eql({msg:'hello',time:0});
+      } else {
+        expect(val).to.eql({msg:'goodbye',time:1});
+      }
+    });
+
+    ref.flush();
+
+    timeChild.push({
+      time:Firebase.ServerValue.TIMESTAMP,
+      msg:'hello'
+    });
+
+    ref.flush();
+
+    timeChild.push({
+      time:Firebase.ServerValue.TIMESTAMP,
+      msg:'goodbye'
+    });
+
+    ref.flush();
+  });
 });

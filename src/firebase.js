@@ -357,6 +357,9 @@ MockFirebase.prototype._generateTimestamp = function(){
 MockFirebase.prototype._dataChanged = function (unparsedData) {
   var pri = utils.getMeta(unparsedData, 'priority', this.priority);
   var data = utils.cleanData(unparsedData);
+  if(utils.isServerTimestamp(data)){
+    data = this._generateTimestamp();
+  }
   if( pri !== this.priority ) {
     this._priChanged(pri);
   }
@@ -375,13 +378,13 @@ MockFirebase.prototype._dataChanged = function (unparsedData) {
       events.push(false);
       this.data = data;
     }
-    else if(utils.isServerTimestamp(data)){
-      events.push(false);
-      this.data = this._generateTimestamp();
-    }
     else {
       keysToChange.forEach(function(key) {
-        this._updateOrAdd(key, unparsedData[key], events);
+        var childData = unparsedData[key];
+        if(utils.isServerTimestamp(childData)){
+          childData = this._generateTimestamp();
+        }
+        this._updateOrAdd(key, childData, events);
       }, this);
     }
 
