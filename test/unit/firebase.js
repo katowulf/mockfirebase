@@ -192,7 +192,7 @@ describe('MockFirebase', function () {
 
       ref.once('value', _.noop, null, context);
       ref.forceCancel(new Error());
-    })
+    });
   });
 
   describe('#fakeEvent', function () {
