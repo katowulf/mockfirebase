@@ -178,6 +178,21 @@ describe('MockFirebase', function () {
         .and.calledWith(err);
     });
 
+    it('cancel callbacks can be null', function(){
+      var context = {};
+      ref.on('value', spy, null, context);
+      ref.flush();
+      expect(spy).to.have.been.calledOn(context);
+      ref.forceCancel(new Error());
+
+      spy.reset();
+      ref.once('value', spy, null, context);
+      ref.flush();
+      expect(spy).to.have.been.calledOn(context);
+
+      ref.once('value', _.noop, null, context);
+      ref.forceCancel(new Error());
+    })
   });
 
   describe('#fakeEvent', function () {
