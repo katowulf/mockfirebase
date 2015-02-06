@@ -53,8 +53,8 @@ describe('Auth', function () {
       ref.changeAuthState(user);
       ref.onAuth(spy);
       ref.flush();
-      expect(spy.firstCall.args[0]).to.not.equal(user);
-      expect(spy.firstCall.args[0]).to.deep.equal(user);
+      expect(spy.secondCall.args[0]).to.not.equal(user);
+      expect(spy.secondCall.args[0]).to.deep.equal(user);
     });
 
   });
@@ -179,6 +179,17 @@ describe('Auth', function () {
       expect(spy).to.have.been.calledOn(context);
     });
 
+    it('is triggered synchronously if the user is already authenticated', function () {
+      ref.changeAuthState({
+        uid: 'kato'
+      });
+      ref.flush();
+      ref.onAuth(spy);
+      expect(spy).to.have.been.calledWithMatch({
+        uid: 'kato',
+      });
+    });
+
   });
 
   describe('#offAuth', function () {
@@ -206,7 +217,7 @@ describe('Auth', function () {
         uid: 'kato1'
       });
       ref.flush();
-      expect(spy).to.have.been.calledTwice;
+      expect(spy).to.have.been.calledFourTimes;
       spy.reset();
       // will not match any context
       ref.offAuth(spy, {});
@@ -242,12 +253,11 @@ describe('Auth', function () {
       expect(spy).to.have.been.called;
     });
 
-    it('does not trigger onAuth callback if auth data is null', function () {
+    it('triggers onAuth callback if auth data is null', function () {
       ref.onAuth(spy);
       ref.unauth();
-      expect(spy).to.not.have.been.called;
+      expect(spy).to.have.been.calledWith(null);
     });
-    
   });
 
   describe('#createUser', function () {
