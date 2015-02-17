@@ -30,6 +30,13 @@ function MockFirebase (path, data, parent, name) {
   this._dataChanged(_.cloneDeep(data) || null);
   this._lastAutoId = null;
   _.extend(this, Auth.prototype, new Auth());
+  try{
+    var Firebase = require('Firebase');
+    this._firebaseMajorVersion = (Firebase && Firebase.SDK_VERSION && Firebase.SDK_VERSION.split('.')[0]);
+  }
+  catch(ex){
+    this._firebaseMajorVersion = '2';
+  }
 }
 
 MockFirebase.ServerValue = {
@@ -191,7 +198,9 @@ MockFirebase.prototype.key = function () {
 
 /* istanbul ignore next */
 MockFirebase.prototype.name = function () {
-  console.warn('ref.name() is deprecated. Use ref.key()');
+  if(this._firebaseMajorVersion !== '1'){
+    console.warn('ref.name() is deprecated. Use ref.key()');
+  }
   return this.key.apply(this, arguments);
 };
 

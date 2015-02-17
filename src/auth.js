@@ -11,6 +11,13 @@ function FirebaseAuth () {
     users: [],
     uidCounter: 1
   };
+  try{
+    var Firebase = require('Firebase');
+    this._firebaseMajorVersion = (Firebase && Firebase.SDK_VERSION && Firebase.SDK_VERSION.split('.')[0]);
+  }
+  catch(ex){
+    this._firebaseMajorVersion = '2';
+  }
 }
 
 FirebaseAuth.prototype.changeAuthState = function (userData) {
@@ -47,7 +54,9 @@ Object.keys(authMethods)
   });
 
 FirebaseAuth.prototype.auth = function (token, callback) {
-  console.warn('FIREBASE WARNING: FirebaseRef.auth() being deprecated. Please use FirebaseRef.authWithCustomToken() instead.');
+  if(this._firebaseMajorVersion !== '1'){
+    console.warn('FIREBASE WARNING: FirebaseRef.auth() being deprecated. Please use FirebaseRef.authWithCustomToken() instead.');
+  }
   this._authEvent('auth', callback);
 };
 
