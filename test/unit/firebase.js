@@ -673,6 +673,20 @@ describe('MockFirebase', function () {
       });
     });
 
+    it('each auto id from the same client should be greater in value than the one before it', function () {
+      var ref1, ref2;
+      ref1 = ref.push({
+        foo: 'bar'
+      });
+      ref.flush();
+      ref2 = ref.push({
+        foo: 'soap'
+      });
+      ref.flush();
+
+      expect(ref1.key()).to.be.lessThan(ref2.key());
+    });
+
     it('can simulate an error', function () {
       var err = new Error();
       ref.failNext('push', err);
