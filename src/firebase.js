@@ -29,6 +29,7 @@ function MockFirebase (path, data, parent, name) {
   this.data = null;
   this._dataChanged(_.cloneDeep(data) || null);
   this._lastAutoId = null;
+  this._clientAutoId = null;
   _.extend(this, Auth.prototype, new Auth());
 }
 
@@ -511,7 +512,14 @@ MockFirebase.prototype._updateChild = function (key, data, events) {
 };
 
 MockFirebase.prototype._newAutoId = function () {
-  this._lastAutoId = 'mock-'+Date.now()+'-'+Math.floor(Math.random()*10000);
+  if(this._clientAutoId === null) {
+    this._clientAutoId = Math.floor(Math.random()*10000);
+  }
+  var id = this._lastAutoId;
+  while(id === this._lastAutoId) {
+    id = 'mock-'+Date.now()+'-'+this._clientAutoId;
+  }
+  this._lastAutoId = id;
   return this._lastAutoId;
 };
 
