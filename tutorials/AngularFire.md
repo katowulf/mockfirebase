@@ -36,7 +36,7 @@ Test
 describe("Unit Tests:", function (){
     window.MockFirebase.override();
 
-    var firebase_ref, scope;
+    var firebaseRef, scope;
 
     beforeEach(function (){
         module("firebase.app")
@@ -44,14 +44,15 @@ describe("Unit Tests:", function (){
         function ($scope, $controller, $firebaseObject){
             scope = $scope;
 
-            var ctrl_data = {
+            var ctrlData = {
                 $scope: scope,
                 $firebaseObject: $firebaseObject
             };
 
-            $controller("firebase.app.controller", ctrl_data);
+            $controller("firebase.app.controller", ctrlData);
 
-            firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
+            //the url used here must be the same as the one used on the controller
+            firebaseRef = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
         it("should read data from firebase", function (){
@@ -61,7 +62,7 @@ describe("Unit Tests:", function (){
                 "studentNo":"P15/8293/2015"
             };
 
-            firebase_ref.set(student);
+            firebaseRef.set(student);
             firebase.flush()
             scope.$digest;
 
@@ -103,7 +104,7 @@ Test
 describe("Unit Tests:", function (){
     window.MockFirebase.override();
 
-    var firebase_ref, scope;
+    var firebaseRef, scope;
 
     beforeEach(function (){
         module("firebase.app")
@@ -111,25 +112,26 @@ describe("Unit Tests:", function (){
         function ($scope, $controller, $firebaseObject){
             scope = $scope;
 
-            var ctrl_data = {
+            var ctrlData = {
                 $scope: scope,
                 $firebaseObject: $firebaseObject
             };
 
-            $controller("firebase.app.controller", ctrl_data);
+            $controller("firebase.app.controller", ctrlData);
 
-            firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
+            //the url used here must be the same as the one used on the controller
+            firebaseRef = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
         it("should save data to firebase", function (){
 
             var response;
 
-            firebase_ref.on("value", function (data) {
+            firebaseRef.on("value", function (data) {
                 response = data.val();
             });
 
-            firebase_ref.flush();
+            firebaseRef.flush();
             scope.$digest();
 
             var keys = _.keys(response); //underscorejs
@@ -163,7 +165,7 @@ This is how to test the controller above.
 describe("Unit Tests:", function (){
     window.MockFirebase.override();
 
-    var firebase_ref, scope;
+    var firebaseRef, scope;
 
     beforeEach(function (){
         module("firebase.app")
@@ -171,14 +173,15 @@ describe("Unit Tests:", function (){
         function ($scope, $controller, $firebaseArray){
             scope = $scope;
 
-            var ctrl_data = {
+            var ctrlData = {
                 $scope: scope,
                 $firebaseArray: $firebaseArray
             };
 
-            $controller("firebase.app.controller", ctrl_data);
+            $controller("firebase.app.controller", ctrlData);
 
-            firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
+            //the url used here must be the same as the one used on the controller
+            firebaseRef = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
         it("should read data from firebase", function (){
@@ -188,7 +191,7 @@ describe("Unit Tests:", function (){
                 "studentNo":"P15/8293/2015"
             };
 
-            firebase_ref.push(student);
+            firebaseRef.push(student);
             firebase.flush()
             scope.$digest;
 
@@ -228,7 +231,7 @@ Test
 describe("Unit Tests:", function (){
     window.MockFirebase.override();
 
-    var firebase_ref, scope;
+    var firebaseRef, scope;
 
     beforeEach(function (){
         module("firebase.app")
@@ -236,24 +239,24 @@ describe("Unit Tests:", function (){
         function ($scope, $controller, $firebaseArray){
             scope = $scope;
 
-            var ctrl_data = {
+            var ctrlData = {
                 $scope: scope,
                 $firebaseArray: $firebaseArray
             };
 
-            $controller("firebase.app.controller", ctrl_data);
-
-            firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
+            $controller("firebase.app.controller", ctrlData);
+            //the url used here must be the same as the one used on the controller
+            firebaseRef = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
         it("should save data to firebase", function (){
             var response;
 
-            firebase_ref.on("value", function (data) {
+            firebaseRef.on("value", function (data) {
                 response = data.val();
             });
 
-            firebase_ref.flush();
+            firebaseRef.flush();
             scope.$digest();
 
             var keys = _.keys(response); //underscorejs
