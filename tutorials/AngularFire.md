@@ -1,4 +1,4 @@
-# Tutorial: Testing Angular Fire Using MockFireBase
+# Tutorial: Testing AngularFire Using MockFireBase
 
 MockFirebase can be used to test both `$firebaseArray` and `$firebaseObject`.
 Below are code snippets of how you'd go  about it.
