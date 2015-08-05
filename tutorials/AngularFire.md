@@ -10,10 +10,11 @@ I will leave you to work on refactoring that. We are going to use both $firebase
 and $firebaseArray to save and read some data on firebase.
 
 Our test will simply:
+
 1. For the write operation, our tests will check if some data has actually been "written" to
 firebase.
-2. For the read operation, we will use our tests to "write" some data that we later read in
-our controller.
+2. For the read operation, we will use our tests to "write" some data that we later read and store
+it in our controller's scope.
 
 ## FirebaseObject
 
@@ -50,8 +51,6 @@ describe("Unit Tests:", function (){
 
             $controller("firebase.app.controller", ctrl_data);
 
-            //Mockfirebase doesnt support angular directly so we need to go crazy
-            //on the bare bones javascript implementation of firebase
             firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
@@ -119,12 +118,12 @@ describe("Unit Tests:", function (){
 
             $controller("firebase.app.controller", ctrl_data);
 
-            //Mockfirebase doesnt support angular directly so we need to go crazy
-            //on the bare bones javascript implementation of firebase
             firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
         it("should save data to firebase", function (){
+
+            var response;
 
             firebase_ref.on("value", function (data) {
                 response = data.val();
@@ -179,8 +178,6 @@ describe("Unit Tests:", function (){
 
             $controller("firebase.app.controller", ctrl_data);
 
-            //Mockfirebase doesnt support angular directly so we need to go crazy
-            //on the bare bones javascript implementation of firebase
             firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
@@ -246,12 +243,11 @@ describe("Unit Tests:", function (){
 
             $controller("firebase.app.controller", ctrl_data);
 
-            //Mockfirebase doesnt support angular directly so we need to go crazy
-            //on the bare bones javascript implementation of firebase
             firebase_ref = new Firebase("https://myurl.firebaseio.com/somechild");
         }]);
 
         it("should save data to firebase", function (){
+            var response;
 
             firebase_ref.on("value", function (data) {
                 response = data.val();
