@@ -311,7 +311,7 @@ MockFirebase.prototype.transaction = function (valueFn, finishedFn, applyLocally
     var newData = _.isUndefined(res) || err? this.getData() : res;
     this._dataChanged(newData);
     if (typeof finishedFn === 'function') {
-      finishedFn(err, err === null && !_.isUndefined(res), new Snapshot(this, newData, this.priority));
+      finishedFn(err, err === null && !_.isUndefined(res), new Snapshot(this, this.getData(), this.priority));
     }
   });
   return [valueFn, finishedFn, applyLocally];
