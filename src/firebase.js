@@ -167,9 +167,22 @@ MockFirebase.prototype.update = function (changes, callback) {
   var err = this._nextErr('update');
   this._defer('update', _.toArray(arguments), function () {
     if (!err) {
-      var base = this.getData();
-      var data = _.assign(_.isObject(base) ? base : {}, changes);
-      this._dataChanged(data);
+      var clone = _.cloneDeep(changes);
+      Object.keys(clone).forEach(function(key) {
+        var path = key.split('/');
+        var node = self;
+        while (path.length > 1) {
+          node = node.child(path.shift());
+        }
+        if (path[0].charAt(0) !== '.') {
+          node = node.child(path[0]);
+        }
+        if (path[0] === '.priority') {
+          node._priChanged(clone[key]);
+        } else {
+          node._dataChanged(clone[key]);
+        }
+      });
     }
     if (callback) callback(err);
   });
