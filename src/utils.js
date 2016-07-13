@@ -11,6 +11,10 @@ exports.mergePaths = function mergePaths (base, add) {
   return base.replace(/\/$/, '')+'/'+add.replace(/^\//, '');
 };
 
+exports.isLegalValue = function isLegalValue (val) {
+  return _.isObject(val) || _.isString(val) || _.isNumber(val) || _.isBoolean(val) || _.isNull(val);
+};
+
 exports.cleanData = function cleanData(data) {
   var newData = _.clone(data);
   if(_.isObject(newData)) {
@@ -23,7 +27,7 @@ exports.cleanData = function cleanData(data) {
 //      _.each(newData, function(v,k) {
 //        newData[k] = cleanData(v);
 //      });
-    if(_.isEmpty(newData)) { newData = null; }
+    if(!exports.isLegalValue(newData)) { newData = null; }
   }
   return newData;
 };
