@@ -1,7 +1,14 @@
-MockFirebase [![Build Status](https://travis-ci.org/katowulf/mockfirebase.svg?branch=master)](https://travis-ci.org/katowulf/mockfirebase)
+MockFirebase
 ============
 
 *This is an experimental library and is not supported by Firebase*
+
+## Casetext Fork
+
+Casetext's fork of mockfirebase has the following improvements over the latest upstream branch:
+ * It allows storing of the value `false`
+ * It uses updated versions of some dependencies whose old versions are not compatible with at least Node 4.2.x
+ * The snapshot passed to a `ref.transaction()` callback will be a snapshot of the post-transaction data, not merely what the update function returned. Specifically, if the transaction update function sets a timestamp using `ServerValue.TIMESTAMP`, the snapshot will have the actual timestamp in it instead of just the tombstone value.
 
 ## Setup
 
