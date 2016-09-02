@@ -52,6 +52,7 @@
     "karma-mocha": "~0.1.6",
     "karma-phantomjs-launcher": "~0.1.4",
     "karma-sinon": "~1.0.3",
+    "rsvp": "^3.2.1",
     "semver": "~3.0.1",
     "sinon": "~1.10.3",
     "sinon-chai": "~2.5.0",

@@ -4,6 +4,27 @@
     window.MockFirebase = window.mockfirebase.MockFirebase;
     window.MockFirebaseSimpleLogin = window.mockfirebase.MockFirebaseSimpleLogin;
 
+    window.mockfirebase.MockFirebaseSdk = {
+      database: function() {
+        return {
+          ref: function(path) {
+            return new window.mockfirebase.MockFirebase(path);
+          },
+          refFromURL: function(url) {
+            return new window.mockfirebase.MockFirebase(url);
+          }
+        };
+      },
+      auth: function() {
+        var auth = new window.mockfirebase.MockFirebase();
+        delete auth.ref;
+        return auth;
+      }
+    };
+    window.mockfirebase.MockFirebaseSdk.auth.GoogleAuthProvider = function() {
+      this.providerId = "google.com";
+    };
+
     var originals = false;
     window.MockFirebase.override = function () {
       originals = {
@@ -11,18 +32,7 @@
         firebase: window.Firebase,
         login: window.FirebaseSimpleLogin
       };
-      window.firebase = {
-        database: function() {
-          return {
-            ref: function(path) {
-              return new window.mockfirebase.MockFirebase(path);
-            },
-            refFromURL: function(url) {
-              return new window.mockfirebase.MockFirebase(url);
-            }
-          };
-        }
-      };
+      window.firebase = window.mockfirebase.MockFirebaseSdk;
       window.Firebase = window.mockfirebase.MockFirebase;
       window.FirebaseSimpleLogin = window.mockfirebase.MockFirebaseSimpleLogin;
     };
