@@ -28,7 +28,7 @@
     var originals = false;
     window.MockFirebase.override = function () {
       originals = {
-        firebase3: window.firebase,
+        firebasesdk: window.firebase,
         firebase: window.Firebase,
         login: window.FirebaseSimpleLogin
       };
@@ -38,7 +38,7 @@
     };
     window.MockFirebase.restore = function () {
       if (!originals) return;
-      window.firebase = originals.firebase3;
+      window.firebase = originals.firebasesdk;
       window.Firebase = originals.firebase;
       window.FirebaseSimpleLogin = originals.login;
     };
