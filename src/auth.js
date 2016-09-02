@@ -202,7 +202,7 @@ FirebaseAuth.prototype.signOut = function () {
       if (updateuser) {
         self._triggerAuthEvent();
       }
-    });
+    }, true);
   });
   return promise;
 };
