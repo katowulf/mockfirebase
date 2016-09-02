@@ -24,6 +24,15 @@
     window.mockfirebase.MockFirebaseSdk.auth.GoogleAuthProvider = function() {
       this.providerId = "google.com";
     };
+    window.mockfirebase.MockFirebaseSdk.auth.TwitterAuthProvider = function() {
+      this.providerId = "twitter.com";
+    };
+    window.mockfirebase.MockFirebaseSdk.auth.FacebookAuthProvider = function() {
+      this.providerId = "facebook.com";
+    };
+    window.mockfirebase.MockFirebaseSdk.auth.GithubAuthProvider = function() {
+      this.providerId = "github.com";
+    };
 
     var originals = false;
     window.MockFirebase.override = function () {
