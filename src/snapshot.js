@@ -48,7 +48,9 @@ MockDataSnapshot.prototype.key = function () {
 };
 
 MockDataSnapshot.prototype.name = function () {
-  console.warn('DataSnapshot.name() is deprecated. Use DataSnapshot.key()');
+  if(this.ref()._firebaseMajorVersion !== '1'){
+    console.warn('DataSnapshot.name() is deprecated. Use DataSnapshot.key()');
+  }
   return this.key.apply(this, arguments);
 };
 
