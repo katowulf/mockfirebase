@@ -81,6 +81,10 @@ MockDataSnapshot.prototype.exportVal = function () {
   return exportData;
 };
 
+MockDataSnapshot.prototype.exists = function () {
+  return this.val() != null;
+};
+
 function isValue (value) {
   return !_.isObject(value);
 }
