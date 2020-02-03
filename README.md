@@ -1,7 +1,9 @@
 MockFirebase [![Build Status](https://travis-ci.org/katowulf/mockfirebase.svg?branch=master)](https://travis-ci.org/katowulf/mockfirebase)
 ============
 
-*This is an experimental library and is not supported by Firebase*
+This worked back in the days of Firebase 1.X. These days, you should use the [Firebase Emulator suite](https://firebase.google.com/docs/emulator-suite).
+
+*This was an experimental library and is not supported by Firebase*
 
 ## Setup
 
