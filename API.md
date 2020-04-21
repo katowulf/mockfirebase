@@ -200,12 +200,12 @@ Finds a user previously created with [`createUser`](https://www.firebase.com/doc
 
 MockFirebase allow you to simulate the behavior of [server timestamps](https://www.firebase.com/docs/web/api/servervalue/timestamp.html) when using a real Firebase instance. Unless you use `Firebase.setClock`, `Firebase.ServerValue.TIMESTAMP` will be transformed to the current date (`Date.now()`) when your data change is flushed. 
 
-##### `Firebase.setClock(fn)` -> `undefined`
+##### `MockFirebase.setClock(fn)` -> `undefined`
 
 Instead of using `Date.now()`, MockFirebase will call the `fn` you provide to generate a timestamp. `fn` should return a number.
 
 <hr>
 
-##### `Firebase.restoreClock()` -> `undefined`
+##### `MockFirebase.restoreClock()` -> `undefined`
 
-After calling `Firebase.setClock`, calling `Firebase.restoreClock` will restore the default timestamp behavior.
+After calling `MockFirebase.setClock`, calling `MockFirebase.restoreClock` will restore the default timestamp behavior.
